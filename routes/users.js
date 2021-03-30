@@ -22,6 +22,29 @@ router.post('/registerr', function(req,res,next){
   }).catch(next);
 });
 
+// confirm user
+router.post('/confirm', (req, res, next) => {
+  const email = req.body.email;
+  User.findOne({ email: email })
+  .then(user => {
+      user.confirmed = true;
+      if(user) {
+        User.findByIdAndUpdate(user._id, user, { useFindAndModify: false })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found!`
+        });
+      } else res.send({ message: "user confirmed." });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Tutorial with id=" + id
+      });
+    });
+      }
+}); 
+});
 
 // get all users
 router.get('/all', (req, res, next) => {
@@ -107,37 +130,10 @@ User.findOne({ email: email })
 
 });
 
-
-
-/*router.post('/login', (req, res, next) => {
-console.log(req.body.email);
-User.findOne({email: req.body.email})
-.then(user => {
-  if(user){
-if(req.user.userType == 'admin') {
-  console.log(req.user.userType);
-  passport.authenticate('local', {
-    successRedirect: '/dashboard',
-    failureRedirect: '/users/login',
-    failureFlash: true
-  })(req, res, next);
-} else {
-  passport.authenticate('local', {
-    successRedirect: '/welcomesub',
-    failureRedirect: '/users/login',
-    failureFlash: true
-  })(req, res, next);
-}
-  }
-});
-});*/
 // Login Handle
 router.post('/login',
   passport.authenticate('local'),
   function(req, res) {
-    // If this function gets called, authentication was successful.
-    // `req.user` contains the authenticated user.
-    // Then you can send your json as response.
     const user = req.user;
     user.password = null;
     res.json({message:"Success", user: user});
@@ -232,7 +228,6 @@ function sendMail(mailToSent) {
   if (error) {
   res.json('error :' + error);
   } else {
-    console.log('Email sent: ' + info.response);
     res.json('email sent' + info.response)
   }
  });
