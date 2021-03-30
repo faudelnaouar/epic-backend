@@ -12,8 +12,9 @@ const User = require('../models/User');
 const File = require('../models/File');
 //const SubUser = require('../models/SubUser');
 const { session } = require('passport');
+const { callbackPromise } = require('nodemailer/lib/shared');
 
-var storage = multer.diskStorage({
+const  storage = multer.diskStorage({
     destination:function(req, file, cb) {
       cb(null, 'uploads');
     },
@@ -21,21 +22,23 @@ var storage = multer.diskStorage({
       cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
     }
   });
-  
-  var upload = multer({
-    storage:storage
-  });
-  
+  const maxSize = 2 * 1024 * 1024;
+
+  let upload = multer({
+    storage: storage,
+    limits: { fileSize: maxSize },
+  }).single("file");
 
 router.get('/upload', (req, res) => res.render('upload'));
 
-router.post('/upload', upload.single('myFile'), (req, res, next) => {
-
+router.post('/upload/:id', upload, async (req, res, next) => {
+  console.log('file :', req.params);
+   
     const file = req.file;
     let errors = [];
 
     if(!file) {
-        errors.push({ msg: 'please fill in all fields!'});
+        errors.json({ msg: 'please fill in all fields!'});
     }
 
     if(errors.length > 0) {
@@ -46,14 +49,14 @@ router.post('/upload', upload.single('myFile'), (req, res, next) => {
 
         const newFile = new File({
             nameFile : req.file.originalname,
-            emailUser : req.user.email,
-            size : req.file.size
+            size : req.file.size,
+            filename: req.file.filename,
+            userId: req.params.id
         });
 
         newFile.save()
         .then(file => {
-            req.flash('success_msg', 'You are registered and you can Log in');
-            res.redirect('/welcomesub');
+           res.json({message: 'File successfully saved'})
         })
          .catch(err => console.log(err));
        }
@@ -66,7 +69,7 @@ router.get('/showfiles', (req, res, next) => {
   File.find({}, function(err, files) {
     if (err) throw err;
     // object of all the users
-    res.render('showFiles',{files:files});
+    res.json({files:files});
   });
 });
 
@@ -76,7 +79,7 @@ router.post('/delete', function(req, res, next) {
  
   File.deleteOne({"_id": objectId(id)}, function(err, result) {
     assert.equal(null, err);
-    console.log('Item deleted');
+    res.json({message: 'file successfully deleted'});
 
   });
 }); 

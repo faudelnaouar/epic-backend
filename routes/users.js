@@ -39,7 +39,7 @@ router.post('/confirm', (req, res, next) => {
     })
     .catch(err => {
       res.status(500).send({
-        message: "Error updating Tutorial with id=" + id
+        message: "Error updating Tutorial "
       });
     });
       }
