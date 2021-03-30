@@ -1,0 +1,20 @@
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+      <div class="card card-body">
+        <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i>  Upload Files</h1>
+
+        <%- include ("./partials/messages"); %>
+        
+        <form action="/files/upload" method="POST" enctype="multipart/form-data">
+         
+                <input type="file" name="myFile">
+                <br>
+                <br>
+          <button type="submit" class="btn btn-primary btn-block">Upload</button>
+        </form>
+        <p class="lead mt-4">
+          No Account? <a href="/welcomesub">go Back</a>
+        </p>
+      </div>
+    </div>
+  </div>

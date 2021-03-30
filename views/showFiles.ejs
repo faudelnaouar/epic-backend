@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Application</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="./assets/style.css">
+
+    <style>
+        table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 100px;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+thead {
+    background-color: aqua;
+}
+    </style>
+</head>
+<body>
+    
+    <!-- Header -->
+        <header id="header">
+            <nav>
+                <div class="container">
+                    <div class="text-center">
+                        <a href="/" class="nav-brand text-dark">list of Files uploaded</a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    <!-- /Header -->
+
+        <main id="site-main">
+            <div class="container">
+                <form action="/" method="POST">
+                    <% if(files!=null) { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>similitude</th>
+                                <th>file name</th>
+                                <th>user email</th>
+                                <th>size</th>
+                                <th>date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% files.forEach(function(item){ %>
+                            <tr>
+                                <td>35%</td>
+                                <td><%= item.nameFile%></td>
+                                <td><%= item.emailUser%></td>
+                                <td><%= item.size%></td>
+                                <td><%= item.date%></td>
+                                <td>
+                                    <a href="/files/delete" class="btn border-shadow delete" data-id=<%= item._id%>>
+                                        <span class="text-gradient"><i class="fas fa-times"></i></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <% } %>
+                </form>
+            </div>
+        </main>
+
+    </body>
+    </html>
