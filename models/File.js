@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-    nameFile: {
+    oroginalName: {
         type: String,
         required: false
     },
@@ -9,7 +9,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    filename: {
+    fileName: {
+        type: String,
+        required: false
+    },
+    userId: {
         type: String,
         required: false
     },

@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 
 //User model
 const User = require('../models/User');
+const File = require('../models/File');
 // const SubUser = require('../models/SubUser');
 const { session } = require('passport');
 const e = require('express');
@@ -46,12 +47,28 @@ router.post('/confirm', (req, res, next) => {
 }); 
 });
 
+
+
+
 // get all users
 router.get('/all', (req, res, next) => {
-  User.find({}).then(function(users){
-    res.send(users);
-}).catch(next);
-});
+  User.find({}).then(function(users) {
+    let newUsers = users;
+    newUsers.map(user => {
+      File.find( {userId: user._id}).then(files => {
+        if(files.length) {
+          user.relatedFiles = files;
+        }
+        });
+      });
+
+      setTimeout(() => {
+        res.send(newUsers);
+      }, 50)
+      
+   }).catch(next);
+ });
+
 
 
 //Login page
@@ -93,14 +110,7 @@ User.findOne({ email: email })
  .then(user => {
      if(user) {
           //User exists
-           errors.push({ msg: 'Email is already registered!'});
-          res.render('register', {
-            errors,
-            name,
-            email,
-            password,
-            password2
-         });
+        res.status(400).send('Email is already registered!')
      } else {
         const newUser = new User({
             name,
@@ -116,8 +126,7 @@ User.findOne({ email: email })
             //Save user
             newUser.save()
               .then(user => {
-                  req.flash('success_msg', 'You are registered and you can Log in');
-                  res.redirect('/users/login');
+              res.send({message: 'successfully register', user: user})
               })
                .catch(err => console.log(err));
 
@@ -142,8 +151,7 @@ router.post('/login',
 // Logout Handle
 router.get('/logout', (req, res) => {
     req.logout();
-    req.flash('success_msg', 'You are logged out');
-    res.redirect('/users/login');
+   res.send({msg: 'Logout success'})
 });
 
 
@@ -155,7 +163,7 @@ router.post('/add_user', (req, res) => {
     
     //Check required fields
     if( !email ) {
-        errors.push({ msg: 'please fill in all fields!'});
+        res.status(400).send('please fill in all fields!')
     }
 
     if(errors.length > 0) {
@@ -169,12 +177,8 @@ router.post('/add_user', (req, res) => {
  .then(user => {
      if(user) {
           //User exists
-           errors.push({ msg: 'Email is already registered!'});
-          res.render('add_user', {
-            errors,
-            email,
-            password     
-         });
+          res.status(400).send('Email is already registered!')
+        
      } else {
         const newUser = new User({
             email,
@@ -247,7 +251,8 @@ router.post('/login_sub', (req, res, next) => {
 router.get('/createpassword', (req, res) => res.render('createPassword'));
 
 router.post('/createpassword', (req, res, next) => {
-  const { password, password2 } = req.body;
+  console.log('body:',req.body);
+  const { password, password2, email } = req.body;
   let errors = [];
 
   if(password !== password2 ) {
@@ -261,23 +266,8 @@ if(errors.length > 0) {
      password2
   });
  } else {
-   User.findOne({'email': req.user.email}) 
+   User.findOne({'email': email}) 
    .then(user => {
-    /*if(user) {
-         //User exists
-          errors.push({ msg: 'Email is already registered!'});
-         res.render('createPassword', {
-           errors,
-           password,
-           password2
-        });
-    } else {*/
-      /* const newUser = new User({
-           name,
-           email,
-           password
-       });*/
-       
       //Hash password
       bycrypt.genSalt(10, (err, salt) => bycrypt.hash(req.body.password, salt, (err, hash) => {
         if(err) throw err;
@@ -286,21 +276,14 @@ if(errors.length > 0) {
 
         user.save()
         .then(user => {
-            req.flash('success_msg', 'You are registered and you can Log in');
-            res.redirect('/welcomesub');
+            res.json({message: 'You are registered and you can Log in'});
         })
          .catch(err => console.log(err));
       }))
-          
-   
-
- //}
-
-});
+    });
  
 }
 
-console.log(req.user.password);
   /*const user = new User();
 
  const newpwd = req.body.password;

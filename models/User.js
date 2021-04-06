@@ -23,10 +23,15 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    relatedFiles: {
+        type: Array,
+        default: []
+    },
     date: {
         type: Date,
         default: Date.now
     }
+    
 });
 
 

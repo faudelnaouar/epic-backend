@@ -48,15 +48,15 @@ router.post('/upload/:id', upload, async (req, res, next) => {
        } else {
 
         const newFile = new File({
-            nameFile : req.file.originalname,
+            oroginalName : req.file.originalname,
             size : req.file.size,
-            filename: req.file.filename,
+            fileName: req.file.filename,
             userId: req.params.id
         });
 
         newFile.save()
         .then(file => {
-           res.json({message: 'File successfully saved'})
+           res.json({message: 'File successfully saved', file: file})
         })
          .catch(err => console.log(err));
        }
