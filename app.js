@@ -37,6 +37,7 @@ app.set('view engine', 'ejs');
 
 // cross origin 
 app.use(function(req, res, next) {
+  res.setHeader("Content-Type", "application/json");
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
