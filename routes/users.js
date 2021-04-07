@@ -12,39 +12,31 @@ const File = require('../models/File');
 const { session } = require('passport');
 const e = require('express');
 
-// test register
-router.post('/registerr', function(req,res,next){
-  User.create(req.body).then(function(user){
-    console.log('user:', req);
-  
-       res.send(user);
-    
-     
-  }).catch(next);
-});
-
 // confirm user
 router.post('/confirm', (req, res, next) => {
   const email = req.body.email;
   User.findOne({ email: email })
   .then(user => {
-      user.confirmed = true;
       if(user) {
+        user.confirmed = true;
         User.findByIdAndUpdate(user._id, user, { useFindAndModify: false })
     .then(data => {
       if (!data) {
         res.status(404).send({
           message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found!`
         });
-      } else res.send({ message: "user confirmed." });
+      } else {
+        res.send({ message: "user confirmed." });
+        return
+      }
     })
     .catch(err => {
-      res.status(500).send({
+      res.status(400).send({
         message: "Error updating Tutorial "
       });
     });
       }
-}); 
+}).catch(next); 
 });
 
 
@@ -155,9 +147,8 @@ router.get('/logout', (req, res) => {
 });
 
 
-router.get('/add_user', (req, res) => res.render('add_user'));
-
 router.post('/add_user', (req, res) => {
+  console.log('body:', req.body)
     const { email, password } = req.body;
     let errors = [];
     
@@ -205,7 +196,6 @@ router.post('/add_user', (req, res) => {
      
 });
 
-router.get('/login_sub', (req, res) => res.render('login_sub'));
 
 // Mail
 function sendMail(mailToSent) {
@@ -219,7 +209,7 @@ function sendMail(mailToSent) {
 
  // Step 2
 
- const url = `http://localhost:4200/confirm?mail=` + mailToSent;
+ const url = `http://localhost:4200/changepassword?mail=` + mailToSent;
 
  const mailOptions = {
   from: 'masterdaruom@gmail.com',
@@ -252,7 +242,7 @@ router.get('/createpassword', (req, res) => res.render('createPassword'));
 
 router.post('/createpassword', (req, res, next) => {
   console.log('body:',req.body);
-  const { password, password2, email } = req.body;
+  const { password, password2, email, name } = req.body;
   let errors = [];
 
   if(password !== password2 ) {
@@ -268,6 +258,23 @@ if(errors.length > 0) {
  } else {
    User.findOne({'email': email}) 
    .then(user => {
+    if(user) {
+      user.confirmed = true;
+      user.name = name;
+      User.findByIdAndUpdate(user._id, user, { useFindAndModify: false })
+  .then(data => {
+    if (!data) {
+      res.status(404).send({
+        message: `Cannot update user`
+      });
+    } else res.json({ message: "user confirmed." });
+  })
+  .catch(err => {
+    res.status(400).send({
+      message: "Error updating "
+    });
+  });
+    }
       //Hash password
       bycrypt.genSalt(10, (err, salt) => bycrypt.hash(req.body.password, salt, (err, hash) => {
         if(err) throw err;
