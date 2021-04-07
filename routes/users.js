@@ -219,7 +219,7 @@ function sendMail(mailToSent) {
 
  // Step 2
 
- const url = `http://localhost:4200/confirm?mail=` + mailToSent;
+ const url = `http://localhost:4200/changepassword?email=` + mailToSent;
 
  const mailOptions = {
   from: 'masterdaruom@gmail.com',
