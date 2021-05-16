@@ -77,8 +77,8 @@ router.post('/delete', function(req, res, next) {
 
   var id = req.body.id;
  
-  File.deleteOne({"_id": objectId(id)}, function(err, result) {
-    assert.equal(null, err);
+  File.deleteOne({"_id":id}, function(err, result) {
+   
     res.json({message: 'file successfully deleted'});
 
   });

@@ -209,7 +209,7 @@ function sendMail(mailToSent) {
 
  // Step 2
 
- const url = `http://localhost:4200/changepassword?email=` + mailToSent;
+ const url = `http://localhost:4200/#/changepassword?email=` + mailToSent;
 
  const mailOptions = {
   from: 'masterdaruom@gmail.com',
@@ -218,11 +218,19 @@ function sendMail(mailToSent) {
   text: 'Bonjour, veuillez confirmer votre compte en cliquant sur ce lien :' + url
  };
 
+ transporter.verify(function(error, success) {
+  if (error) {
+       console.log('verify:', error);
+  } else {
+       console.log('Server is ready to take our messages');
+  }
+});
+
  transporter.sendMail(mailOptions, function(error, info){
   if (error) {
-  res.json('error :' + error);
+  console.log('error :' + error);
   } else {
-    res.json('email sent' + info.response)
+    console.log('email sent' + info.response)
   }
  });
 

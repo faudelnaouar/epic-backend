@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
 const bodyParser = require('body-parser')
-
+const cors = require('cors');
 mongoose.connect('mongodb://localhost:27017/epic', {useNewUrlParser: true, useUnifiedTopology: true})
 const db = mongoose.connection;
 
@@ -26,11 +26,11 @@ const app = express();
 
 //Passport config
 require('./config/passport')(passport);
-
+// cors
+app.use(cors());
 //EJS
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
-
 //BodyParser
 // app.use(express.urlencoded({ extended: false }));
 // parse application/x-www-form-urlencoded
@@ -45,7 +45,9 @@ app.use(function(req, res, next) {
 
 // parse application/json
 app.use(bodyParser.json())
-
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 // Express session
 app.use(session({
     secret: 'secret',
